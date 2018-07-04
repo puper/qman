@@ -4,6 +4,9 @@ name = "core"
 [components.core.config]
 brokers = ["127.0.0.1:9092"]
 
+[components.core.config.storage]
+name = "mysql"
+
 [components.log]
 name = "log"
 

@@ -7,7 +7,8 @@ import (
 
 	"github.com/puper/qman/consumer/app"
 	"github.com/puper/qman/consumer/core"
-	"github.com/puper/qman/consumer/storage/mysql"
+	_ "github.com/puper/qman/consumer/handler/jsonrpc"
+	_ "github.com/puper/qman/consumer/storage/mysql"
 )
 
 func Bootstrap(configFile string) error {
@@ -22,7 +23,6 @@ func Bootstrap(configFile string) error {
 	if err := myapp.Init(); err != nil {
 		return err
 	}
-	app.GetCore().SetStorage(&mysql.Storage{})
 	if err := myapp.Start(); err != nil {
 		return err
 	}

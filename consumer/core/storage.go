@@ -30,7 +30,7 @@ func NewStorage(config *StorageConfig) (Storage, error) {
 	if ok {
 		return f(config.Config)
 	}
-	return nil, fmt.Errorf("storage `%v` not found")
+	return nil, fmt.Errorf("storage `%v` not found", config.Name)
 }
 
 type Event struct {

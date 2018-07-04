@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	core.RegisterHandler("jsonrpc")
+	core.RegisterHandler("jsonrpc", NewHandler)
 }
 
 type Handler struct {
@@ -24,9 +24,9 @@ type Config struct {
 	RetryCount int           `json:"retry_count"`
 }
 
-func New(config interface{}) (*Handler, error) {
-	c := new(Config)
-	err := helpers.StructDecode(config, c, "json")
+func NewHandler(in interface{}) (core.Handler, error) {
+	config := new(Config)
+	err := helpers.StructDecode(in, config, "json")
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (this *Handler) Process(msg *core.Message) {
 		if resp.Error == nil {
 			return
 		}
-		if this.RetryCount == i {
+		if this.config.RetryCount == i {
 			return
 		}
 		i++

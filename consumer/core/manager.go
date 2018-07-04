@@ -17,12 +17,14 @@ type Manager struct {
 }
 
 func New(config *Config) (*Manager, error) {
-	var (
-		err error
-	)
+	storage, err := NewStorage(&config.Storage)
+	if err != nil {
+		return nil, err
+	}
 	m := &Manager{
 		Config:         config,
 		topicConsumers: make(map[string]*TopicConsumer),
+		storage:        storage,
 	}
 	m.Consumer, err = sarama.NewConsumer(m.Config.Brokers, nil)
 	return m, err
