@@ -7,6 +7,7 @@ import (
 	"code.int.thoseyears.com/golang/ppgo/engine"
 	"github.com/Sirupsen/logrus"
 	redigo "github.com/garyburd/redigo/redis"
+	"github.com/puper/qman/consumer/core"
 )
 
 var (
@@ -32,4 +33,8 @@ func GetLog(name string) *logrus.Logger {
 
 func GetRedis(name string) redigo.Conn {
 	return app.GetInstance("redis").(*redis.Redis).Get(name)
+}
+
+func GetCore() *core.Manager {
+	return app.GetInstance("core").(*core.Manager)
 }

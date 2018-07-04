@@ -12,14 +12,14 @@ const (
 )
 
 type KeyConsumer struct {
-	tc *TopicComsumer
+	tc *TopicConsumer
 
 	messagesMutex sync.Mutex
 	messages      *list.List
 	state         int
 }
 
-func NewKeyConsumer(tc *TopicComsumer) *KeyConsumer {
+func NewKeyConsumer(tc *TopicConsumer) *KeyConsumer {
 	kc := &KeyConsumer{
 		tc:       tc,
 		messages: list.New(),

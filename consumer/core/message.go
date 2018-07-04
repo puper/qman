@@ -24,6 +24,10 @@ func NewMessage(cm *sarama.ConsumerMessage) (*Message, error) {
 	return msg, nil
 }
 
-type MessageWithContext interface {
-	Message() *Message
+func (this *Message) WithContext() {
+	return
+}
+
+type MessageWithContext struct {
+	Message *Message
 }

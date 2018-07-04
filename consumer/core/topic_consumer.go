@@ -7,7 +7,7 @@ import (
 	"github.com/Shopify/sarama"
 )
 
-type TopicComsumer struct {
+type TopicConsumer struct {
 	Topic string
 
 	manager           *Manager
@@ -18,7 +18,16 @@ type TopicComsumer struct {
 	subscriptions      map[string]map[string]*Subscription
 }
 
-func (this *TopicComsumer) Start() error {
+func NewTopicConsumer(manager *Manager, topic string) *TopicConsumer {
+	return &TopicConsumer{
+		manager:       manager,
+		Topic:         topic,
+		keyConsumers:  make(map[string]*KeyConsumer),
+		subscriptions: make(map[string]map[string]*Subscription),
+	}
+}
+
+func (this *TopicConsumer) Start() error {
 	partitions, err := this.manager.Consumer.Partitions(this.Topic)
 	if err != nil {
 		return err
@@ -44,7 +53,7 @@ func (this *TopicComsumer) Start() error {
 	return nil
 }
 
-func (this *TopicComsumer) Stop() error {
+func (this *TopicConsumer) Stop() error {
 	for _, kc := range this.keyConsumers {
 		if err := kc.Stop(); err != nil {
 			return err
@@ -53,17 +62,7 @@ func (this *TopicComsumer) Stop() error {
 	return nil
 }
 
-func (this *TopicComsumer) GetSubscriptions(tag string) []*Subscription {
-	this.subscriptionsMutex.RLock()
-	defer this.subscriptionsMutex.RUnlock()
-	result := make([]*Subscription, len(this.subscriptions[tag]))
-	for _, sub := range this.subscriptions[tag] {
-		result = append(result, sub)
-	}
-	return result
-}
-
-func (this *TopicComsumer) Put(msg *Message) {
+func (this *TopicConsumer) Put(msg *Message) {
 	if msg.Key == "" {
 		this.subscriptionsMutex.RLock()
 		for _, sub := range this.subscriptions[msg.Tag] {
@@ -86,4 +85,28 @@ func (this *TopicComsumer) Put(msg *Message) {
 			this.keyConsumersMutex.Unlock()
 		}
 	}
+}
+
+func (this *TopicConsumer) DeleteSubscription(tag, name string) {
+	delete(this.subscriptions[tag], name)
+	if len(this.subscriptions[tag]) == 0 {
+		delete(this.subscriptions, tag)
+	}
+}
+
+func (this *TopicConsumer) SetSubscription(tag, name string, sub *Subscription) {
+	_, ok := this.subscriptions[tag]
+	if !ok {
+		this.subscriptions[tag] = make(map[string]*Subscription)
+	}
+	this.subscriptions[tag][name] = sub
+}
+
+func (this *TopicConsumer) GetSubscription(tag, name string) (*Subscription, bool) {
+	sub, ok := this.subscriptions[tag][name]
+	return sub, ok
+}
+
+func (this *TopicConsumer) GetSubscriptionCount() int {
+	return len(this.subscriptions)
 }
