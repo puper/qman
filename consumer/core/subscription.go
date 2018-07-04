@@ -5,40 +5,28 @@ import (
 	"sync"
 )
 
+type SubscriptionConfig struct {
+	Name          string         `json:"name"`
+	Topic         string         `json:"topic"`
+	Tag           string         `json:"tag"`
+	HandlerConfig *HandlerConfig `json:"handler_config"`
+}
+
 type Subscription struct {
+	Config           *SubscriptionConfig
 	mutex            sync.Mutex
 	messages         *list.List
 	handler          Handler
 	newMessageSignal chan struct{}
 	tickets          chan struct{}
-
-	subscriptions map[string]map[string]*Subscription
-
-	MaxConcurrentCount    int
-	MaxFlightMessageCount int
 }
 
-func (this *Subscription) Put(msg *Message) {
-	this.mutex.Lock()
-	this.messages.PushFront(msg)
-	this.mutex.Unlock()
-	select {
-	case this.newMessageSignal <- struct{}{}:
-	default:
-	}
+func (this *Subscription) Start() error {
+	return nil
 }
 
-func (this *Subscription) loop() {
-	for {
-		this.mutex.Lock()
-		msg := this.messages.Back()
-		this.mutex.Unlock()
-		if msg == nil {
-			<-this.newMessageSignal
-		} else {
-			this.process(msg)
-		}
-	}
+func (this *Subscription) Stop() error {
+	return nil
 }
 
 func (this *Subscription) Process(msg *Message) {

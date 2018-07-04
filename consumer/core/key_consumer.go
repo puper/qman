@@ -5,31 +5,63 @@ import (
 	"sync"
 )
 
+const (
+	STATE_NOT_STARTED = 0
+	STATE_STARTED     = 1
+	STATE_STOPPED     = 2
+)
+
 type KeyConsumer struct {
-	manager *Manager
+	tc *TopicComsumer
 
 	messagesMutex sync.Mutex
 	messages      *list.List
+	state         int
+}
+
+func NewKeyConsumer(tc *TopicComsumer) *KeyConsumer {
+	kc := &KeyConsumer{
+		tc:       tc,
+		messages: list.New(),
+	}
+	return kc
 }
 
 func (this *KeyConsumer) Start() error {
-
+	return nil
 }
 
-func (this *KeyConsumer) Stop() {
-
+func (this *KeyConsumer) Stop() error {
+	return nil
 }
 
-func (this *KeyConsumer) Put(msg *Message) {
+func (this *KeyConsumer) Put(msg *Message) bool {
 	this.messagesMutex.Lock()
-	this.messages.PushFront(msg)
-	this.messagesMutex.Unlock()
+	defer this.messagesMutex.Unlock()
+	if this.state == STATE_NOT_STARTED {
+		this.messages.PushFront(msg)
+		go this.loop()
+		return true
+	} else if this.state == STATE_STARTED {
+		this.messages.PushFront(msg)
+		return true
+	}
+	return false
 }
 
 func (this *KeyConsumer) loop() {
-	for msg := range this.messages {
-		for _, sub := range this.manager.GetSubscriptions(msg.Topic, msg.Tag) {
-			sub.Put(msg)
+	for {
+		this.messagesMutex.Lock()
+		e := this.messages.Back()
+		if e == nil {
+			break
 		}
+		this.messagesMutex.Unlock()
+		msg := e.Value.(*Message)
+		this.tc.subscriptionsMutex.RLock()
+		for _, sub := range this.tc.subscriptions[msg.Tag] {
+			sub.Process(msg)
+		}
+		this.tc.subscriptionsMutex.RUnlock()
 	}
 }

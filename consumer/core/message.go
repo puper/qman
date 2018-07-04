@@ -23,3 +23,7 @@ func NewMessage(cm *sarama.ConsumerMessage) (*Message, error) {
 	msg.Key = string(cm.Key)
 	return msg, nil
 }
+
+type MessageWithContext interface {
+	Message() *Message
+}

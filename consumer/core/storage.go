@@ -9,9 +9,9 @@ const (
 )
 
 type Event struct {
-	Type    EventType
-	OldData []byte
-	NewData []byte
+	Type EventType
+	Old  *SubscriptionConfig
+	New  *SubscriptionConfig
 }
 
 type SubscriptionChangeCallback func(*Event)
@@ -19,5 +19,5 @@ type SubscriptionChangeCallback func(*Event)
 type Storage interface {
 	WatchSubscriptionChange(SubscriptionChangeCallback)
 	Start() error
-	Stop()
+	Stop() error
 }

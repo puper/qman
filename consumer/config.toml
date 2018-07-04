@@ -2,7 +2,7 @@
 name = "core"
 
 [components.core.config]
-
+brokers = ["127.0.0.1:9092"]
 
 [components.log]
 name = "log"
@@ -11,26 +11,3 @@ name = "log"
 out = "std"
 level = "debug"
 format = "text"
-
-[components.db]
-name = "db"
-[components.db.config.qman]
-driver = "mysql"
-master = "root:root@tcp(127.0.0.1:3306)/qman?charset=utf8&parseTime=True&loc=Local"
-slave = []
-
-[components.redis]
-name = "redis"
-[components.redis.config.qman]
-network = "tcp"
-address = "localhost:8888"
-dialconnectiontimeout = "10"
-dialreadtimeout = "10"
-dialwritetimeout = "10"
-dialpassword = ""
-db = "0"
-maxidle = "10"
-maxactive = "10"
-testonborrow = "true"
-idletimeout = "10"
-wait = "true"

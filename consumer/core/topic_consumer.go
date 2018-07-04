@@ -10,14 +10,12 @@ import (
 type TopicComsumer struct {
 	Topic string
 
-	manager  *Manager
-	messages chan *Message
-
+	manager           *Manager
 	keyConsumersMutex sync.RWMutex
 	keyConsumers      map[string]*KeyConsumer
 
 	subscriptionsMutex sync.RWMutex
-	subscriptions      map[string]*Subscription
+	subscriptions      map[string]map[string]*Subscription
 }
 
 func (this *TopicComsumer) Start() error {
@@ -39,24 +37,20 @@ func (this *TopicComsumer) Start() error {
 				if err != nil {
 					continue
 				}
-				this.messages <- msg
+				this.Put(msg)
 			}
 		}(pc)
 	}
 	return nil
 }
 
-func (this *TopicComsumer) Stop() {
-
-}
-
-func (this *TopicComsumer) GetKeyConsumer(key string) *KeyConsumer {
-	this.keyConsumersMutex.RLock()
-	defer this.keyConsumersMutex.RUnlock()
-	kc, ok := this.keyConsumers[key]
-	if !ok {
+func (this *TopicComsumer) Stop() error {
+	for _, kc := range this.keyConsumers {
+		if err := kc.Stop(); err != nil {
+			return err
+		}
 	}
-	return kc
+	return nil
 }
 
 func (this *TopicComsumer) GetSubscriptions(tag string) []*Subscription {
@@ -69,14 +63,27 @@ func (this *TopicComsumer) GetSubscriptions(tag string) []*Subscription {
 	return result
 }
 
-func (this *TopicComsumer) loop() {
-	for msg := range this.messages {
-		if msg.Key != "" {
-			this.GetKeyConsumer(msg.Key).Put(msg)
-		} else {
-			for _, sub := range this.GetSubscriptions(msg.Topic, msg.Tag) {
-				sub.Put(msg)
-			}
+func (this *TopicComsumer) Put(msg *Message) {
+	if msg.Key == "" {
+		this.subscriptionsMutex.RLock()
+		for _, sub := range this.subscriptions[msg.Tag] {
+			sub.Process(msg)
+		}
+		this.subscriptionsMutex.RUnlock()
+	} else {
+		for {
+
+		}
+		this.keyConsumersMutex.RLock()
+		kc, ok := this.keyConsumers[msg.Key]
+		kc.Put(msg)
+		this.keyConsumersMutex.RUnlock()
+		if !ok {
+			this.keyConsumersMutex.Lock()
+			kc = NewKeyConsumer(this)
+			this.keyConsumers[msg.Key] = kc
+			kc.Put(msg)
+			this.keyConsumersMutex.Unlock()
 		}
 	}
 }

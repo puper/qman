@@ -1,13 +1,30 @@
 # qman
 - docker run --name=kafka -p 2181:2181 -p 9092:9092 --env ADVERTISED_HOST=127.0.0.1 --env ADVERTISED_PORT=9092 spotify/kafka
+- docker run -d --name rabbitmq -p 5672:5672 rabbitmq
 
+- etcd维护订阅关系
+- 简单的http handler
+- 数据持久化
+
+# topic 数量
+
+
+# message in mysql
+- topic
+- tag
+- key
+- partition
+- value
+- message_time
 
 # message
 - topic
 - tag
 - key
 - value
-- 
+
+
+- 消息
 
 # subscription
     - topic
@@ -103,16 +120,39 @@ flight messages
 
 
 
+- 存储
+    - offset
+    - 失败记录
+    - pending的消息
+    - 
 
 
-- header
-    - x-pet-token
-    - x-pet-timestamp
-    - x-pet-salt
-    - x-pet-sign
-- body
-    - params
+- message
+    - topic
+    - partition
+    - tag
+    - key
+    - offset
+    - message_time
+    - value
 
+- failed_message
+    - topic
+    - partition
+    - tag
+    - key
+    - offset
+    - message_time
+    - data
+    - response
 
+- etcd
+    - subscriptions
+        - name
+        - topic
+        - tag
+        - handler_config
 
-
+没有性别数据的病例
+图片编辑
+推荐标签
