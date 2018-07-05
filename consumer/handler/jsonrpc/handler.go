@@ -36,7 +36,7 @@ func NewHandler(in interface{}) (core.Handler, error) {
 	}, nil
 }
 
-func (this *Handler) Process(msg *core.Message) {
+func (this *Handler) Process(msg *core.MessageWithResult) {
 	arg := map[string]interface{}{
 		"message": msg,
 	}
@@ -51,4 +51,5 @@ func (this *Handler) Process(msg *core.Message) {
 		}
 		i++
 	}
+	msg.Done(nil)
 }

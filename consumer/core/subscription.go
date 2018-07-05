@@ -41,13 +41,6 @@ func (this *Subscription) Stop() error {
 	return nil
 }
 
-func (this *Subscription) Process(msg *Message) {
-	this.tickets <- struct{}{}
-	this.process(msg)
-}
-
-func (this *Subscription) process(msg *Message) {
-	for {
-		this.handler.Process(msg)
-	}
+func (this *Subscription) Process(msg *MessageWithResult) {
+	this.handler.Process(msg)
 }

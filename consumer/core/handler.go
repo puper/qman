@@ -20,7 +20,7 @@ type HandlerConfig struct {
 }
 
 type Handler interface {
-	Process(*Message)
+	Process(*MessageWithResult)
 }
 
 func NewHandler(hc *HandlerConfig) (Handler, error) {

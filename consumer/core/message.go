@@ -24,10 +24,30 @@ func NewMessage(cm *sarama.ConsumerMessage) (*Message, error) {
 	return msg, nil
 }
 
-func (this *Message) WithContext() {
-	return
+func (this *Message) WithResult() *MessageWithResult {
+	return &MessageWithResult{
+		Message: this,
+		done:    make(chan struct{}, 1),
+	}
 }
 
-type MessageWithContext struct {
+type MessageWithResult struct {
 	Message *Message
+	result  *MessageResult
+	done    chan struct{}
+}
+
+type MessageResult struct {
+	Success  bool
+	Response string
+}
+
+func (this *MessageWithResult) Done(result *MessageResult) {
+	this.result = result
+	close(this.done)
+}
+
+func (this *MessageWithResult) Result() interface{} {
+	<-this.done
+	return this.result
 }

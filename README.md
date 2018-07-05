@@ -157,3 +157,39 @@ flight messages
 图片编辑
 推荐标签
 
+SELECT
+ id ID, 
+ code "药品编码", 
+ standardCode "药品本位码", 
+ (CASE WHEN category = 1 THEN '西药' WHEN category = 2 THEN '中成药' WHEN category = 3 THEN '中草药' END) '药品分类', 
+ name '药品名称', 
+ genericName '药品通用名称', 
+ alias '药品别名',
+ pinyin '药品拼音',
+ images '图片json数组',
+ (CASE WHEN type=1 THEN '非处方药' WHEN type=2 THEN '处方药' END) '类型',
+ 
+ (CASE WHEN originType=1 THEN '国产' WHEN originType=2 THEN '进口' END) '产地类型',
+ dosageForm '剂型',
+ composition '药品成分',
+ `character` '药品性状',
+ packing '包装',
+ storage '贮藏',
+ approvalNum '批准文号/注册证号',
+ note '说明/注意',
+ manufacturer '生产厂商',
+ manufacturerEn '生产厂商（英文）',
+ brand '品牌',
+ specification '规格',
+ attending '功能主治',
+ adverseReaction '不良反应',
+ taboo '禁忌',
+ drugInteract '药物相互作用',
+ `usage` '用法',
+ dosage '用量',
+ unit '单位'
+
+
+
+
+ FROM drug LIMIT 15000,5000;

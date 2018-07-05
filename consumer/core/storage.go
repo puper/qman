@@ -41,5 +41,7 @@ type Event struct {
 type SubscriptionChangeCallback func(*Event)
 
 type Storage interface {
-	WatchSubscriptionChange(SubscriptionChangeCallback)
+	SetWatchCallback(SubscriptionChangeCallback)
+	Start() error
+	Stop() error
 }

@@ -60,7 +60,7 @@ func (this *KeyConsumer) loop() {
 		msg := e.Value.(*Message)
 		this.tc.subscriptionsMutex.RLock()
 		for _, sub := range this.tc.subscriptions[msg.Tag] {
-			sub.Process(msg)
+			sub.Process(msg.WithResult())
 		}
 		this.tc.subscriptionsMutex.RUnlock()
 	}

@@ -27,15 +27,12 @@ func New(config *Config) (*Manager, error) {
 		storage:        storage,
 	}
 	m.Consumer, err = sarama.NewConsumer(m.Config.Brokers, nil)
+	m.storage.SetWatchCallback(m.onSubscriptionChange)
 	return m, err
 }
 
-func (this *Manager) SetStorage(s Storage) {
-	this.storage = s
-}
-
 func (this *Manager) Start() error {
-	this.storage.WatchSubscriptionChange(this.onSubscriptionChange)
+	this.storage.Start()
 	return nil
 }
 
@@ -43,7 +40,9 @@ func (this *Manager) Stop() error {
 	for _, tc := range this.topicConsumers {
 		tc.Stop()
 	}
-	return this.Consumer.Close()
+	this.Consumer.Close()
+	this.storage.Stop()
+	return nil
 }
 
 func (this *Manager) onSubscriptionChange(ev *Event) {

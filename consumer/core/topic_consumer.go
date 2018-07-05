@@ -66,7 +66,7 @@ func (this *TopicConsumer) Put(msg *Message) {
 	if msg.Key == "" {
 		this.subscriptionsMutex.RLock()
 		for _, sub := range this.subscriptions[msg.Tag] {
-			sub.Process(msg)
+			sub.Process(msg.WithResult())
 		}
 		this.subscriptionsMutex.RUnlock()
 	} else {
