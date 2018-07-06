@@ -70,9 +70,6 @@ func (this *TopicConsumer) Put(msg *Message) {
 		}
 		this.subscriptionsMutex.RUnlock()
 	} else {
-		for {
-
-		}
 		this.keyConsumersMutex.RLock()
 		kc, ok := this.keyConsumers[msg.Key]
 		kc.Put(msg)
@@ -87,6 +84,7 @@ func (this *TopicConsumer) Put(msg *Message) {
 	}
 }
 
+//统统不加锁，使用的地方加锁
 func (this *TopicConsumer) DeleteSubscription(tag, name string) {
 	delete(this.subscriptions[tag], name)
 	if len(this.subscriptions[tag]) == 0 {

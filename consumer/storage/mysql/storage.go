@@ -55,6 +55,10 @@ func (this *Storage) Start() error {
 					Tag:   "testTag",
 					HandlerConfig: core.HandlerConfig{
 						Name: "jsonrpc",
+						Config: map[string]interface{}{
+							"ServerAddr": "http://127.0.0.1:8081/test",
+							"Method":     "Test",
+						},
 					},
 				},
 			})

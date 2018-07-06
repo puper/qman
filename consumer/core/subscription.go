@@ -12,11 +12,10 @@ type SubscriptionConfig struct {
 }
 
 type Subscription struct {
-	Config           *SubscriptionConfig
-	mutex            sync.Mutex
-	handler          Handler
-	newMessageSignal chan struct{}
-	tickets          chan struct{}
+	Config       *SubscriptionConfig
+	mutex        sync.Mutex
+	handlerMutex sync.RWMutex
+	handler      Handler
 }
 
 func NewSubscription(config *SubscriptionConfig) *Subscription {
@@ -29,7 +28,9 @@ func (this *Subscription) UpdateConfig(config *SubscriptionConfig) {
 	h, err := NewHandler(&config.HandlerConfig)
 	if err == nil {
 		this.Config = config
+		this.handlerMutex.Lock()
 		this.handler = h
+		this.handlerMutex.Unlock()
 	}
 }
 
@@ -42,5 +43,8 @@ func (this *Subscription) Stop() error {
 }
 
 func (this *Subscription) Process(msg *MessageWithResult) {
-	this.handler.Process(msg)
+	this.handlerMutex.RLock()
+	handler := this.handler
+	this.handlerMutex.RUnlock()
+	handler.Process(msg)
 }

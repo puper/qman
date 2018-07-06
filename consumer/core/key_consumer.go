@@ -53,10 +53,10 @@ func (this *KeyConsumer) loop() {
 	for {
 		this.messagesMutex.Lock()
 		e := this.messages.Back()
-		if e == nil {
-			break
-		}
 		this.messagesMutex.Unlock()
+		if e == nil {
+			return
+		}
 		msg := e.Value.(*Message)
 		this.tc.subscriptionsMutex.RLock()
 		for _, sub := range this.tc.subscriptions[msg.Tag] {

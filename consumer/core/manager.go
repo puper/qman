@@ -46,20 +46,25 @@ func (this *Manager) Stop() error {
 }
 
 func (this *Manager) onSubscriptionChange(ev *Event) {
+	this.topicConsumersMutex.Lock()
+	defer this.topicConsumersMutex.Unlock()
 	tc, ok := this.topicConsumers[ev.Data.Topic]
 	if ev.Type == EVENT_DELETE {
 		if ok {
+			tc.subscriptionsMutex.Lock()
 			tc.DeleteSubscription(ev.Data.Tag, ev.Data.Name)
 			if tc.GetSubscriptionCount() == 0 {
 				tc.Stop()
 				delete(this.topicConsumers, ev.Data.Topic)
 			}
+			tc.subscriptionsMutex.Unlock()
 		}
 	} else {
 		if !ok {
 			tc = NewTopicConsumer(this, ev.Data.Topic)
 			this.topicConsumers[ev.Data.Topic] = tc
 		}
+		tc.subscriptionsMutex.Lock()
 		sub, ok := tc.GetSubscription(ev.Data.Tag, ev.Data.Name)
 		if !ok {
 			sub = NewSubscription(&ev.Data)
@@ -67,6 +72,7 @@ func (this *Manager) onSubscriptionChange(ev *Event) {
 		} else {
 			sub.UpdateConfig(&ev.Data)
 		}
+		tc.subscriptionsMutex.Unlock()
 
 	}
 }

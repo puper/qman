@@ -6,6 +6,13 @@
 - 简单的http handler
 - 数据持久化
 
+
+
+# 持久化
+- 每个partition 处理完毕的offset
+- 每个tag每个partition处理完毕的offset
+- 定时更新
+
 # topic 数量
 
 

@@ -1,0 +1,17 @@
+[components.server]
+name = "gin"
+[components.server.config]
+addr = ":8080"
+
+[components.producer]
+name = "producer"
+[components.producer.config]
+brokers = ["127.0.0.1:9092"]
+
+[components.log]
+name = "log"
+
+[components.log.config.default]
+out = "std"
+level = "debug"
+format = "text"
